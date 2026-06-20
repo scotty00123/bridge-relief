@@ -1,1 +1,224 @@
+/* ===== BRIDGE RELIEF - App.css ===== */
 
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Inter:wght@400;500;600&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #f4f7f4;
+  color: #1a1a1a;
+}
+
+/* ===== HEADER ===== */
+.header {
+  background-color: #1b4332;
+  padding: 16px 32px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.logo-svg {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+}
+
+.header-title {
+  color: #ffffff;
+  font-family: 'Merriweather', serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.header-subtitle {
+  color: #95d5b2;
+  font-size: 0.8rem;
+  margin-top: 2px;
+}
+
+/* ===== HERO BANNER ===== */
+.hero {
+  background: linear-gradient(135deg, #1b4332 0%, #2d6a4f 60%, #40916c 100%);
+  color: white;
+  text-align: center;
+  padding: 64px 24px;
+}
+
+.hero h1 {
+  font-family: 'Merriweather', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.4;
+  max-width: 600px;
+  margin: 0 auto 16px;
+}
+
+.hero p {
+  font-size: 1rem;
+  color: #b7e4c7;
+  max-width: 480px;
+  margin: 0 auto 28px;
+}
+
+.hero-btn {
+  background-color: #ffffff;
+  color: #1b4332;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.2s;
+}
+
+.hero-btn:hover {
+  background-color: #d8f3dc;
+}
+
+/* ===== MAIN CONTENT ===== */
+.main-content {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.section-title {
+  font-family: 'Merriweather', serif;
+  font-size: 1.4rem;
+  color: #1b4332;
+  margin-bottom: 20px;
+  border-left: 4px solid #40916c;
+  padding-left: 12px;
+}
+
+/* ===== CARDS ===== */
+.card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 20px;
+  border: 1px solid #d8f3dc;
+  box-shadow: 0 2px 8px rgba(27, 67, 50, 0.08);
+  transition: box-shadow 0.2s;
+}
+
+.card:hover {
+  box-shadow: 0 4px 16px rgba(27, 67, 50, 0.15);
+}
+
+.card-title {
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: #1b4332;
+  margin-bottom: 8px;
+}
+
+.card-body {
+  color: #444;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.card-tag {
+  display: inline-block;
+  background: #d8f3dc;
+  color: #1b4332;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  margin-top: 12px;
+}
+
+/* ===== FORM ===== */
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 500;
+  color: #1b4332;
+  margin-bottom: 6px;
+  font-size: 0.95rem;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #b7e4c7;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-family: 'Inter', sans-serif;
+  background: #f8fff9;
+  color: #1a1a1a;
+  outline: none;
+  transition: border 0.2s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  border-color: #40916c;
+  background: #ffffff;
+}
+
+.submit-btn {
+  background-color: #1b4332;
+  color: white;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.2s;
+}
+
+.submit-btn:hover {
+  background-color: #2d6a4f;
+}
+
+/* ===== FOOTER ===== */
+.footer {
+  background-color: #1b4332;
+  color: #b7e4c7;
+  text-align: center;
+  padding: 32px 20px;
+  margin-top: 60px;
+  font-size: 0.9rem;
+}
+
+.footer strong {
+  color: #ffffff;
+  display: block;
+  font-family: 'Merriweather', serif;
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+.footer a {
+  color: #95d5b2;
+  text-decoration: none;
+}
+
+.footer a:hover {
+  text-decoration: underline;
+}
