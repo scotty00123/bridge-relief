@@ -29,7 +29,7 @@ function timeAgo(ts) {
   const days = Math.floor((Date.now() - ts) / 86400000);
   if (days <= 0) return "today";
   if (days === 1) return "1 day ago";
-  return ${days} days ago;
+ return days + " days ago";
 }
 
 function RequestCard({ req, onOpenThread, onShare, isAdmin, unreadCount }) {
