@@ -8,7 +8,7 @@ const ORG_NAME = "Bridge Relief";
 const ORG_TAGLINE = "Helping Hands Network · Lifeline Aid";
 
 // TODO: replace with your real contact email
-const ORG_EMAIL = "help@yourorganization.org";
+const ORG_EMAIL = "bridgerelief.help@gmail.com";
 
 const AID_MIN = 5000;
 const AID_MAX = 350000;
