@@ -75,7 +75,7 @@ function RequestCard({ req, onOpenThread, onShare, isAdmin, unreadCount }) {
 
 function RequestForm({ onSubmit, onCancel }) {
   const [form, setForm] = useState({
-    name: "", region: REGIONS[0], cause: "nature", title: "", story: "", needed: ""
+    name: "", region: REGIONS[0], cause: "nature", title: "", story: "", needed: "", contact: ""
   });
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -230,6 +230,8 @@ export default function App() {
   const [filterRegion, setFilterRegion] = useState("all");
   const [filterStatus, setFilterStatus] = useState("open");
 
+  const showAdminButton = typeof window !== "undefined" && window.location.search.includes("admin");
+
   useEffect(() => { loadRequests(); }, []);
 
   async function loadRequests() {
@@ -291,10 +293,12 @@ export default function App() {
             {isAdmin ? (
               <button className="btn-ghost" onClick={() => setIsAdmin(false)}><LogOut size={15} /> Sign out</button>
             ) : (
-              <button className="btn-ghost" onClick={() => setShowAdminLogin(true)}><Lock size={15} /> Admin</button>
+              showAdminButton && (
+                <button className="btn-ghost" onClick={() => setShowAdminLogin(true)}><Lock size={15} /> Admin</button>
+              )
             )}
             <button className="btn-primary" onClick={() => { setShowForm(true); setSubmitted(false); }}>
-              <Plus size={15} /> Request aid
+              🌿 Request aid
             </button>
           </div>
         </div>
