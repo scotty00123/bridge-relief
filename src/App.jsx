@@ -40,6 +40,49 @@ const LogoSVG = () => (
   </svg>
 );
 
+function AboutModal({ onClose }) {
+  return (
+    <div className="modal-backdrop" onClick={onClose}>
+      <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: "600px" }}>
+        <h2 className="form-heading">About Bridge Relief</h2>
+        <p className="form-sub" style={{ fontStyle: "italic", color: "#2d6a4f" }}>Bridging the gap between need and hope since 2009</p>
+        
+        <p style={{ marginBottom: "16px", lineHeight: "1.7", color: "#333" }}>
+          Bridge Relief is a humanitarian aid platform dedicated to connecting individuals and families in crisis with the support they need to rebuild their lives. What began as a small community initiative over 15 years ago has grown into a trusted global network that has helped over 30,000 people across the world.
+        </p>
+
+        <h3 style={{ color: "#1b4332", marginBottom: "8px", fontFamily: "Merriweather, serif" }}>Our Mission</h3>
+        <p style={{ marginBottom: "16px", lineHeight: "1.7", color: "#333" }}>
+          To ensure that no person facing hardship is left without a lifeline. We believe that every hand extended brings someone closer to hope.
+        </p>
+
+        <h3 style={{ color: "#1b4332", marginBottom: "8px", fontFamily: "Merriweather, serif" }}>What We Offer</h3>
+        <ul style={{ marginBottom: "16px", paddingLeft: "20px", lineHeight: "2", color: "#333" }}>
+          <li>🌪️ <strong>Disaster Relief</strong> — Support for those affected by natural disasters</li>
+          <li>💼 <strong>Employment Crisis</strong> — Aid for those who have lost their income</li>
+          <li>♿ <strong>Disability Support</strong> — Assistance for those with disability-related needs</li>
+          <li>🏥 <strong>Medical Aid</strong> — Help for those facing urgent health challenges</li>
+          <li>🏛️ <strong>Policy & Funding Cuts</strong> — Support for those affected by government changes</li>
+        </ul>
+
+        <h3 style={{ color: "#1b4332", marginBottom: "8px", fontFamily: "Merriweather, serif" }}>How It Works</h3>
+        <p style={{ marginBottom: "16px", lineHeight: "1.7", color: "#333" }}>
+          Submit your request confidentially. Our review team carefully evaluates every submission with dignity and care. Approved requests receive direct support and follow-up communication.
+        </p>
+
+        <h3 style={{ color: "#1b4332", marginBottom: "8px", fontFamily: "Merriweather, serif" }}>Our Promise</h3>
+        <p style={{ marginBottom: "20px", lineHeight: "1.7", color: "#333" }}>
+          Every request is reviewed privately. Your story stays safe with us. 🌿
+        </p>
+
+        <div className="form-actions">
+          <button className="btn-primary" onClick={onClose}>Close</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function RequestCard({ req, onOpenThread, onShare, isAdmin, unreadCount }) {
   const meta = causeMeta[req.cause];
   const Icon = meta.icon;
@@ -222,6 +265,7 @@ export default function App() {
   const [submitted, setSubmitted] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [showAdminLogin, setShowAdminLogin] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
   const [threadReq, setThreadReq] = useState(null);
   const [threadMessages, setThreadMessages] = useState([]);
   const [shareReq, setShareReq] = useState(null);
@@ -290,6 +334,7 @@ export default function App() {
             </div>
           </div>
           <div className="header-actions">
+            <button className="btn-ghost" onClick={() => setShowAbout(true)}>About</button>
             {isAdmin ? (
               <button className="btn-ghost" onClick={() => setIsAdmin(false)}><LogOut size={15} /> Sign out</button>
             ) : (
@@ -361,6 +406,7 @@ export default function App() {
         <p>All requests are reviewed privately. Contact us: <a href={"mailto:" + ORG_EMAIL}>{ORG_EMAIL}</a></p>
       </footer>
 
+      {showAbout && <AboutModal onClose={() => setShowAbout(false)} />}
       {showForm && (
         <div className="modal-backdrop" onClick={() => setShowForm(false)}>
           <RequestForm onSubmit={handleSubmit} onCancel={() => setShowForm(false)} />
