@@ -46,16 +46,9 @@ function AboutModal({ onClose }) {
       <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: "600px" }}>
         <h2 className="form-heading">About Bridge Relief</h2>
         <p className="form-sub" style={{ fontStyle: "italic", color: "#2d6a4f" }}>Bridging the gap between need and hope since 2009</p>
-        
-        <p style={{ marginBottom: "16px", lineHeight: "1.7", color: "#333" }}>
-          Bridge Relief is a humanitarian aid platform dedicated to connecting individuals and families in crisis with the support they need to rebuild their lives. What began as a small community initiative over 15 years ago has grown into a trusted global network that has helped over 30,000 people across the world.
-        </p>
-
+        <p style={{ marginBottom: "16px", lineHeight: "1.7", color: "#333" }}>Bridge Relief is a humanitarian aid platform dedicated to connecting individuals and families in crisis with the support they need to rebuild their lives. What began as a small community initiative over 15 years ago has grown into a trusted global network that has helped over 30,000 people across the world.</p>
         <h3 style={{ color: "#1b4332", marginBottom: "8px", fontFamily: "Merriweather, serif" }}>Our Mission</h3>
-        <p style={{ marginBottom: "16px", lineHeight: "1.7", color: "#333" }}>
-          To ensure that no person facing hardship is left without a lifeline. We believe that every hand extended brings someone closer to hope.
-        </p>
-
+        <p style={{ marginBottom: "16px", lineHeight: "1.7", color: "#333" }}>To ensure that no person facing hardship is left without a lifeline. We believe that every hand extended brings someone closer to hope.</p>
         <h3 style={{ color: "#1b4332", marginBottom: "8px", fontFamily: "Merriweather, serif" }}>What We Offer</h3>
         <ul style={{ marginBottom: "16px", paddingLeft: "20px", lineHeight: "2", color: "#333" }}>
           <li>🌪️ <strong>Disaster Relief</strong> — Support for those affected by natural disasters</li>
@@ -64,17 +57,10 @@ function AboutModal({ onClose }) {
           <li>🏥 <strong>Medical Aid</strong> — Help for those facing urgent health challenges</li>
           <li>🏛️ <strong>Policy & Funding Cuts</strong> — Support for those affected by government changes</li>
         </ul>
-
         <h3 style={{ color: "#1b4332", marginBottom: "8px", fontFamily: "Merriweather, serif" }}>How It Works</h3>
-        <p style={{ marginBottom: "16px", lineHeight: "1.7", color: "#333" }}>
-          Submit your request confidentially. Our review team carefully evaluates every submission with dignity and care. Approved requests receive direct support and follow-up communication.
-        </p>
-
+        <p style={{ marginBottom: "16px", lineHeight: "1.7", color: "#333" }}>Submit your request confidentially. Our review team carefully evaluates every submission with dignity and care. Approved requests receive direct support and follow-up communication.</p>
         <h3 style={{ color: "#1b4332", marginBottom: "8px", fontFamily: "Merriweather, serif" }}>Our Promise</h3>
-        <p style={{ marginBottom: "20px", lineHeight: "1.7", color: "#333" }}>
-          Every request is reviewed privately. Your story stays safe with us. 🌿
-        </p>
-
+        <p style={{ marginBottom: "20px", lineHeight: "1.7", color: "#333" }}>Every request is reviewed privately. Your story stays safe with us. 🌿</p>
         <div className="form-actions">
           <button className="btn-primary" onClick={onClose}>Close</button>
         </div>
@@ -83,9 +69,10 @@ function AboutModal({ onClose }) {
   );
 }
 
-function RequestCard({ req, onOpenThread, onShare, isAdmin, unreadCount }) {
+function RequestCard({ req, onOpenThread, onShare, isAdmin, unreadCount, myRequestId }) {
   const meta = causeMeta[req.cause];
   const Icon = meta.icon;
+  const isMyRequest = myRequestId === req.id;
   return (
     <article className="card">
       <div className="card-top">
@@ -96,8 +83,12 @@ function RequestCard({ req, onOpenThread, onShare, isAdmin, unreadCount }) {
         <span className="location">{req.region}</span>
       </div>
       {req.status === "resolved" && <span className="resolved-badge"><Check size={12} /> Resolved</span>}
+      {req.photoUrl && (
+        <img src={req.photoUrl} alt={req.name} style={{ width: "48px", height: "48px", borderRadius: "50%", objectFit: "cover", marginBottom: "8px", border: "2px solid #b7e4c7" }} />
+      )}
       <h3 className="card-title">{req.title}</h3>
       <p className="card-name">— {req.name} · {timeAgo(req.createdAt)}</p>
+      {req.age && <p style={{ fontSize: "0.8rem", color: "#666", marginBottom: "4px" }}>Age: {req.age} · {req.occupation} · {req.maritalStatus}</p>}
       <p className="card-story">{req.story}</p>
       <div className="requested-amount">
         Requested support: <strong>${req.needed.toLocaleString()}</strong>
@@ -106,11 +97,13 @@ function RequestCard({ req, onOpenThread, onShare, isAdmin, unreadCount }) {
         <button className="btn-thread" onClick={() => onShare(req)}>
           <Share2 size={15} /> Share
         </button>
-        <button className="btn-thread" onClick={() => onOpenThread(req)}>
-          <MessageCircle size={15} />
-          {isAdmin ? "Reply" : "Chat with us"}
-          {unreadCount > 0 && <span className="unread-dot">{unreadCount}</span>}
-        </button>
+        {(isAdmin || isMyRequest) && (
+          <button className="btn-thread" onClick={() => onOpenThread(req)}>
+            <MessageCircle size={15} />
+            {isAdmin ? "Reply" : "Chat with us"}
+            {unreadCount > 0 && <span className="unread-dot">{unreadCount}</span>}
+          </button>
+        )}
       </div>
     </article>
   );
@@ -118,12 +111,23 @@ function RequestCard({ req, onOpenThread, onShare, isAdmin, unreadCount }) {
 
 function RequestForm({ onSubmit, onCancel }) {
   const [form, setForm] = useState({
-    name: "", region: REGIONS[0], cause: "nature", title: "", story: "", needed: "", contact: ""
+    name: "", region: REGIONS[0], cause: "nature", title: "", story: "",
+    needed: "", contact: "", age: "", occupation: "", maritalStatus: "Single"
   });
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [photoFile, setPhotoFile] = useState(null);
+  const [photoPreview, setPhotoPreview] = useState(null);
 
   function update(field, value) { setForm(f => ({ ...f, [field]: value })); }
+
+  function handlePhoto(e) {
+    const file = e.target.files[0];
+    if (file) {
+      setPhotoFile(file);
+      setPhotoPreview(URL.createObjectURL(file));
+    }
+  }
 
   async function handleSubmit() {
     if (!form.name || !form.title || !form.story || !form.needed || !form.contact) {
@@ -137,7 +141,23 @@ function RequestForm({ onSubmit, onCancel }) {
     }
     setError("");
     setSubmitting(true);
-    await onSubmit({ name: form.name, contact: form.contact, region: form.region, cause: form.cause, title: form.title, story: form.story, needed: amount });
+
+    let photoUrl = null;
+    if (photoFile) {
+      const fileName = Date.now() + "_" + photoFile.name;
+      const { data: uploadData } = await supabase.storage.from("photos").upload(fileName, photoFile);
+      if (uploadData) {
+        const { data: urlData } = supabase.storage.from("photos").getPublicUrl(fileName);
+        photoUrl = urlData.publicUrl;
+      }
+    }
+
+    await onSubmit({
+      name: form.name, contact: form.contact, region: form.region,
+      cause: form.cause, title: form.title, story: form.story,
+      needed: amount, age: form.age, occupation: form.occupation,
+      maritalStatus: form.maritalStatus, photoUrl
+    });
     setSubmitting(false);
   }
 
@@ -146,8 +166,42 @@ function RequestForm({ onSubmit, onCancel }) {
       <h2 className="form-heading">Tell us what happened</h2>
       <p className="form-sub">Share enough that our team understands your situation. Your story and contact info stay private.</p>
       {error && <div className="form-error">{error}</div>}
+
+      <div style={{ textAlign: "center", marginBottom: "16px" }}>
+        <div style={{ width: "72px", height: "72px", borderRadius: "50%", background: "#d8f3dc", margin: "0 auto 8px", overflow: "hidden", border: "2px solid #b7e4c7", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          {photoPreview ? <img src={photoPreview} alt="preview" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <span style={{ fontSize: "2rem" }}>📷</span>}
+        </div>
+        <label style={{ cursor: "pointer", color: "#2d6a4f", fontSize: "0.85rem", fontWeight: "600" }}>
+          Upload photo (optional)
+          <input type="file" accept="image/*" onChange={handlePhoto} style={{ display: "none" }} />
+        </label>
+      </div>
+
       <label className="field"><span>Your name</span><input type="text" value={form.name} onChange={e => update("name", e.target.value)} /></label>
       <label className="field"><span>Contact info (email or phone – private)</span><input type="text" value={form.contact} onChange={e => update("contact", e.target.value)} /></label>
+      <label className="field"><span>Age</span><input type="number" value={form.age} onChange={e => update("age", e.target.value)} placeholder="Your age" /></label>
+      <label className="field"><span>Occupation / Employment status</span>
+        <select value={form.occupation} onChange={e => update("occupation", e.target.value)}>
+          <option value="">Select...</option>
+          <option>Employed</option>
+          <option>Unemployed</option>
+          <option>Self-employed</option>
+          <option>Retired</option>
+          <option>Before retirement</option>
+          <option>Student</option>
+          <option>Unable to work due to disability</option>
+          <option>Other</option>
+        </select>
+      </label>
+      <label className="field"><span>Marital status</span>
+        <select value={form.maritalStatus} onChange={e => update("maritalStatus", e.target.value)}>
+          <option>Single</option>
+          <option>Married</option>
+          <option>Divorced</option>
+          <option>Widowed</option>
+          <option>Separated</option>
+        </select>
+      </label>
       <label className="field"><span>Region</span>
         <select value={form.region} onChange={e => update("region", e.target.value)}>
           {REGIONS.map(r => <option key={r} value={r}>{r}</option>)}
@@ -221,7 +275,7 @@ function ThreadModal({ request, messages, isAdmin, onClose, onSend }) {
           {messages.length === 0 && <p className="empty-thread">No messages yet.</p>}
           {messages.map(m => (
             <div key={m.id} className={"thread-msg " + (m.fromAdmin ? "from-admin" : "from-user")}>
-              <span className="thread-sender">{m.fromAdmin ? "Bridge Relief" : request.name}</span>
+              <span className="thread-sender">{m.fromAdmin ? "Bridge Relief Team" : request.name}</span>
               <p>{m.body}</p>
               <span className="thread-time">{timeAgo(m.createdAt)}</span>
             </div>
@@ -273,6 +327,7 @@ export default function App() {
   const [filterCause, setFilterCause] = useState("all");
   const [filterRegion, setFilterRegion] = useState("all");
   const [filterStatus, setFilterStatus] = useState("open");
+  const [myRequestId, setMyRequestId] = useState(() => localStorage.getItem("myRequestId") || null);
 
   const showAdminButton = typeof window !== "undefined" && window.location.search.includes("admin");
 
@@ -292,8 +347,15 @@ export default function App() {
   }
 
   async function handleSubmit(data) {
-    const { error } = await supabase.from("requests").insert([{ ...data, status: "open", createdAt: Date.now() }]);
-    if (!error) { setShowForm(false); setSubmitted(true); loadRequests(); }
+    const { data: inserted, error } = await supabase.from("requests").insert([{ ...data, status: "open", createdAt: Date.now() }]).select();
+    if (!error && inserted && inserted[0]) {
+      const newId = inserted[0].id;
+      setMyRequestId(newId);
+      localStorage.setItem("myRequestId", newId);
+      setShowForm(false);
+      setSubmitted(true);
+      loadRequests();
+    }
   }
 
   async function openThread(req) {
@@ -357,7 +419,7 @@ export default function App() {
       <main className="main">
         {submitted && (
           <div className="success-banner">
-            <Check size={18} /> Your request was submitted. Our team will review it privately and reach out via your contact info.
+            <Check size={18} /> Your request was submitted! Our team will review it privately. You can now use the Chat button on your request to communicate with us. 🌿
           </div>
         )}
 
@@ -391,7 +453,7 @@ export default function App() {
         <div className="cards">
           {filtered.map(req => (
             <div key={req.id}>
-              <RequestCard req={req} onOpenThread={openThread} onShare={setShareReq} isAdmin={isAdmin} unreadCount={unreadCounts[req.id] || 0} />
+              <RequestCard req={req} onOpenThread={openThread} onShare={setShareReq} isAdmin={isAdmin} unreadCount={unreadCounts[req.id] || 0} myRequestId={myRequestId} />
               {isAdmin && req.status === "open" && (
                 <button className="btn-resolve" onClick={() => resolveRequest(req)}>
                   <Check size={13} /> Mark resolved
