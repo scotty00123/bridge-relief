@@ -29,6 +29,18 @@ function timeAgo(ts) {
   return days + " days ago";
 }
 
+async function sendNotification(type, data) {
+  try {
+    await fetch("/api/notify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type, ...data })
+    });
+  } catch (e) {
+    console.log("Notification error:", e);
+  }
+}
+
 const LogoSVG = () => (
   <svg width="42" height="42" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
     <circle cx="24" cy="19" r="13" fill="#40916c"/>
@@ -123,10 +135,7 @@ function RequestForm({ onSubmit, onCancel }) {
 
   function handlePhoto(e) {
     const file = e.target.files[0];
-    if (file) {
-      setPhotoFile(file);
-      setPhotoPreview(URL.createObjectURL(file));
-    }
+    if (file) { setPhotoFile(file); setPhotoPreview(URL.createObjectURL(file)); }
   }
 
   async function handleSubmit() {
@@ -166,7 +175,6 @@ function RequestForm({ onSubmit, onCancel }) {
       <h2 className="form-heading">Tell us what happened</h2>
       <p className="form-sub">Share enough that our team understands your situation. Your story and contact info stay private.</p>
       {error && <div className="form-error">{error}</div>}
-
       <div style={{ textAlign: "center", marginBottom: "16px" }}>
         <div style={{ width: "72px", height: "72px", borderRadius: "50%", background: "#d8f3dc", margin: "0 auto 8px", overflow: "hidden", border: "2px solid #b7e4c7", display: "flex", alignItems: "center", justifyContent: "center" }}>
           {photoPreview ? <img src={photoPreview} alt="preview" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <span style={{ fontSize: "2rem" }}>📷</span>}
@@ -176,7 +184,6 @@ function RequestForm({ onSubmit, onCancel }) {
           <input type="file" accept="image/*" onChange={handlePhoto} style={{ display: "none" }} />
         </label>
       </div>
-
       <label className="field"><span>Your name</span><input type="text" value={form.name} onChange={e => update("name", e.target.value)} /></label>
       <label className="field"><span>Contact info (email or phone – private)</span><input type="text" value={form.contact} onChange={e => update("contact", e.target.value)} /></label>
       <label className="field"><span>Age</span><input type="number" value={form.age} onChange={e => update("age", e.target.value)} placeholder="Your age" /></label>
@@ -327,7 +334,9 @@ export default function App() {
   const [filterCause, setFilterCause] = useState("all");
   const [filterRegion, setFilterRegion] = useState("all");
   const [filterStatus, setFilterStatus] = useState("open");
-  const [myRequestId, setMyRequestId] = useState(() => localStorage.getItem("myRequestId") || null);
+  const [myRequestId, setMyRequestId] = useState(() => {
+    try { return localStorage.getItem("myRequestId") || null; } catch { return null; }
+  });
 
   const showAdminButton = typeof window !== "undefined" && window.location.search.includes("admin");
 
@@ -351,10 +360,11 @@ export default function App() {
     if (!error && inserted && inserted[0]) {
       const newId = inserted[0].id;
       setMyRequestId(newId);
-      localStorage.setItem("myRequestId", newId);
+      try { localStorage.setItem("myRequestId", newId); } catch {}
       setShowForm(false);
       setSubmitted(true);
       loadRequests();
+      await sendNotification("new_request", { name: data.name, title: data.title, contact: data.contact });
     }
   }
 
@@ -369,6 +379,9 @@ export default function App() {
     await supabase.from("messages").insert([{ requestId: threadReq.id, body, fromAdmin: isAdmin, createdAt: Date.now() }]);
     const { data } = await supabase.from("messages").select("*").eq("requestId", threadReq.id).order("createdAt", { ascending: true });
     setThreadMessages(data || []);
+    if (isAdmin && threadReq.contact) {
+      await sendNotification("admin_reply", { name: threadReq.name, contact: threadReq.contact });
+    }
   }
 
   async function resolveRequest(req) {
